@@ -8,23 +8,22 @@ const ModalCategory = ({ isOpen, onClose }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        // Handle category creation logic here
         onClose()
     }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900">Crear Categoría</h2>
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl">
+                <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 className="text-base font-bold text-gray-900">Crear Categoría</h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full p-1"
+                        className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full p-1"
                     >
                         <X className="h-6 w-6" />
                     </button>
                 </div>
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div className="relative">
                         <input
                             id="title"
@@ -45,7 +44,7 @@ const ModalCategory = ({ isOpen, onClose }) => {
                     <div className="relative">
                         <input
                             id="duration"
-                            type="text"
+                            type="number"
                             value={category.duration}
                             onChange={(e) => setCategory({ ...category, duration: e.target.value })}
                             required
@@ -63,13 +62,13 @@ const ModalCategory = ({ isOpen, onClose }) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-3 rounded-xl border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-base font-medium transition-colors"
+                            className="px-4 py-2 rounded-xl border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-base font-medium transition-colors"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-3 rounded-xl bg-primary text-white font-medium hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-base transition-colors"
+                            className="px-4 py-2 rounded-xl bg-primary text-white font-medium hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-base transition-colors"
                         >
                             Crear
                         </button>
@@ -81,4 +80,3 @@ const ModalCategory = ({ isOpen, onClose }) => {
 }
 
 export default ModalCategory
-

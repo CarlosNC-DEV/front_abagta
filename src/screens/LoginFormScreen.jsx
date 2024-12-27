@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { User, Lock, Eye, EyeOff } from 'lucide-react'
 import LogoApp from '../assets/logo.png'
 
 export default function LoginForm() {
@@ -45,12 +45,15 @@ export default function LoginForm() {
                                 <div className="relative group">
                                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white" size={20} />
                                     <input
-                                        type={showPassword ? "text" : "password"}
+                                        type="text"
                                         required
                                         className="w-full pl-10 pr-12 py-3 bg-white bg-opacity-25 border-2 border-transparent rounded-xl text-white placeholder-white/80 focus:outline-none focus:bg-white/30 focus:border-white/50 transition-all duration-300 shadow-sm font-semibold"
                                         placeholder="Contraseña"
                                         value={credentials.password}
                                         onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                                        style={{
+                                            WebkitTextSecurity: showPassword ? 'none' : 'disc',
+                                        }}
                                     />
                                     <button
                                         type="button"
@@ -69,7 +72,6 @@ export default function LoginForm() {
                                 >
                                     <span className="flex items-center justify-center font-bold text-lg">
                                         Ingresar
-                                        <ArrowRight className="ml-2 transform transition-transform duration-300 group-hover:translate-x-1" size={24} />
                                     </span>
                                 </button>
                             </div>

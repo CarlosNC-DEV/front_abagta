@@ -35,8 +35,8 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-gray-200 p-6">
-          <h2 className="text-2xl font-bold text-gray-900">
+        <div className="flex items-center justify-between border-b border-gray-200 p-4">
+          <h2 className="text-base font-bold text-gray-900">
             {user ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
           </h2>
           <button

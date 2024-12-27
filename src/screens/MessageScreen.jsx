@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Edit, ChevronDown, ChevronUp } from 'lucide-react'
+import { Edit, ChevronDown, ChevronUp, ChevronLeft } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import ModalMessage from '../components/messages/ModalMessage'
 
 const messages = [
@@ -34,6 +35,7 @@ const MessageScreen = () => {
     const [openMessageId, setOpenMessageId] = useState(null)
     const [editingMessage, setEditingMessage] = useState(null)
     const [messagesList, setMessagesList] = useState(messages)
+    const navigate = useNavigate()
 
     const handleViewClick = (messageId) => {
         setOpenMessageId(openMessageId === messageId ? null : messageId)
@@ -54,9 +56,9 @@ const MessageScreen = () => {
 
     const getHighlightedContent = (content) => {
         const variables = [
-            { key: '{nombre}', class: 'bg-primary/20 text-primary-dark' },
-            { key: '{placa}', class: 'bg-secondary/20 text-secondary-dark' },
-            { key: '{telefono}', class: 'bg-primary/20 text-primary-dark' }
+            { key: '{nombre}', class: 'text-blue-600 bg-blue-100' },
+            { key: '{placa}', class: 'text-green-600 bg-green-100' },
+            { key: '{telefono}', class: 'text-purple-600 bg-purple-100' }
         ]
 
         let highlightedContent = content
@@ -71,19 +73,36 @@ const MessageScreen = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-secondary p-4 md:p-8">
-            <div className="mx-auto max-w-4xl">
-                <header className="mb-6 text-center">
-                    <h1 className="text-3xl font-bold text-white mb-2">Mensajes Personalizados</h1>
-                    <p className="text-white">Gestiona los mensajes automáticos para diferentes momentos del ciclo de pago</p>
-                </header>
-                <div className="bg-white rounded-2xl shadow-xl p-4 space-y-4">
+        <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-secondary p-4 sm:p-6 lg:p-8">
+            <div className="max-w-4xl mx-auto">
+
+                <div className="sticky top-3 z-10 mb-6">
+                    <div className="bg-secondary bg-opacity-80 backdrop-blur-lg rounded-2xl shadow-lg">
+                        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex items-center justify-between h-14">
+                                <div className="flex items-center">
+                                    <button
+                                        onClick={() => navigate(-1)}
+                                        className="mr-4 p-2 rounded-full text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
+                                    >
+                                        <ChevronLeft className="h-6 w-6" />
+                                        <span className="sr-only">Volver</span>
+                                    </button>
+                                    <span className="text-base font-semibold text-white">Mensajes Personalizados</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p className="text-white text-center mb-6">Gestiona los mensajes automáticos para diferentes momentos del ciclo de pago</p>
+                <div className="bg-white rounded-2xl shadow-xl p-6 space-y-6">
                     {messagesList.map((message) => (
                         <div
                             key={message.id}
-                            className="overflow-hidden rounded-xl border border-gray-200 transition-all duration-200 ease-in-out hover:shadow-md"
+                            className="overflow-hidden rounded-xl border border-gray-200 transition-all duration-200 ease-in-out hover:shadow-md bg-gray-50"
                         >
-                            <div className="flex items-center justify-between px-4 py-3 bg-gray-50">
+                            <div className="flex items-center justify-between px-6 py-4">
                                 <span className="text-gray-800 font-medium">{message.timing}</span>
                                 <div className="flex gap-2">
                                     <button
@@ -110,7 +129,7 @@ const MessageScreen = () => {
                                 </div>
                             </div>
                             {openMessageId === message.id && (
-                                <div className="px-4 py-3 bg-white border-t border-gray-200">
+                                <div className="px-6 py-4 bg-white border-t border-gray-200">
                                     <p className="text-gray-700 text-sm leading-relaxed">
                                         {getHighlightedContent(message.content)}
                                     </p>

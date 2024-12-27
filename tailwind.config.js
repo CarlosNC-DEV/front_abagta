@@ -13,8 +13,8 @@ export default {
           light: 'rgb(41, 171, 255)',
         },
         secondary: {
-          DEFAULT: 'rgb(255, 102, 0)',
-          dark: 'rgb(204, 82, 0)',
+          DEFAULT: 'rgb(9, 82, 129)',
+          dark: 'rgb(17, 137, 215)',
         },
       },
       animation: {

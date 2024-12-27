@@ -19,9 +19,9 @@ const ModalMessage = ({ isOpen, onClose, message, onSave }) => {
     }
 
     const variables = [
-        { key: '{nombre}', label: 'nombre' },
-        { key: '{placa}', label: 'placa' },
-        { key: '{telefono}', label: 'teléfono' }
+        { key: '{nombre}', label: 'nombre', class: 'bg-blue-500 text-white' },
+        { key: '{placa}', label: 'placa', class: 'bg-green-500 text-white' },
+        { key: '{telefono}', label: 'teléfono', class: 'bg-purple-500 text-white' }
     ]
 
     const insertVariable = (variable) => {
@@ -31,8 +31,8 @@ const ModalMessage = ({ isOpen, onClose, message, onSave }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl">
-                <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                    <h2 className="text-2xl font-bold text-gray-900">Editar Mensaje</h2>
+                <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h2 className="text-base font-bold text-gray-900">Editar Mensaje</h2>
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full p-1"
@@ -46,12 +46,12 @@ const ModalMessage = ({ isOpen, onClose, message, onSave }) => {
                             Variables disponibles
                         </label>
                         <div className="flex flex-wrap gap-2">
-                            {variables.map(({ key, label }) => (
+                            {variables.map(({ key, label, class: className }) => (
                                 <button
                                     key={key}
                                     type="button"
                                     onClick={() => insertVariable(key)}
-                                    className="rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                                    className={`rounded-md ${className} px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
                                 >
                                     {label}
                                 </button>
