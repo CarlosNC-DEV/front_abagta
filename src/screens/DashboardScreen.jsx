@@ -30,9 +30,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-secondary p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-secondary px-4 md:px-8">
       <div className="mx-auto max-w-4xl">
-        <header className="flex justify-between items-center py-5">
+        <header className="flex justify-between items-center py-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-white">ABAGTA GPS</h1>
           </div>
