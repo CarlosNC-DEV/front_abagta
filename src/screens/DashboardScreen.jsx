@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, MessageSquare, Users, ChevronRight, Menu } from 'lucide-react'
+import { Users, ChevronRight, Menu, CirclePlus, MessageCircle } from 'lucide-react'
 import ModalCategory from '../components/dashboard/ModalCategory'
 import BottomSheet from '../components/dashboard/BottomSheet'
 
@@ -49,14 +49,14 @@ const Dashboard = () => {
             onClick={handleCreateCategory}
             className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-primary font-semibold transition-all hover:bg-gray-100 active:bg-gray-200 shadow-lg hover:shadow-xl"
           >
-            <Plus className="h-5 w-5" />
+            <CirclePlus className="h-5 w-5" />
             Crear Categoría
           </button>
           <button
             onClick={handleNavigateToMessages}
             className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-primary font-semibold transition-all hover:bg-gray-100 active:bg-gray-200 shadow-lg hover:shadow-xl"
           >
-            <MessageSquare className="h-5 w-5" />
+            <MessageCircle className="h-5 w-5" />
             Mensajes Personalizados
           </button>
         </div>
@@ -98,7 +98,7 @@ const Dashboard = () => {
               className="w-full flex items-center justify-between px-4 py-3 bg-primary rounded-xl shadow-sm text-white font-semibold transition-all hover:bg-primary-dark active:bg-primary-darker"
             >
               <span className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
+                <CirclePlus className="h-5 w-5" />
                 Crear Categoría
               </span>
               <ChevronRight className="h-5 w-5" />
@@ -108,7 +108,7 @@ const Dashboard = () => {
               className="w-full flex items-center justify-between px-4 py-3 bg-primary rounded-xl shadow-sm text-white font-semibold transition-all hover:bg-primary-dark active:bg-primary-darker"
             >
               <span className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" />
+                <MessageCircle className="h-5 w-5" />
                 Mensajes Personalizados
               </span>
               <ChevronRight className="h-5 w-5" />
