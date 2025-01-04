@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import LogoApp from "../../assets/logo.png";
 import { login } from "./domain/service";
 import toast from "react-hot-toast";
+import Loading from "../../components/loading/Loading";
 
 export default function LoginForm() {
   const [credentials, setCredentials] = useState({
@@ -11,6 +12,7 @@ export default function LoginForm() {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -23,6 +25,7 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const response = await login(credentials);
       if (response.status) {
@@ -35,6 +38,8 @@ export default function LoginForm() {
       }
     } catch {
       toast.error("Error al intentar iniciar sesión");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,9 +117,14 @@ export default function LoginForm() {
                 <button
                   type="submit"
                   className="w-full px-4 py-3 text-white bg-secondary rounded-xl hover:bg-secondary-dark transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary group shadow-lg transform hover:scale-105"
+                  disabled={isLoading}
                 >
                   <span className="flex items-center justify-center font-bold text-lg">
-                    Ingresar
+                    {isLoading ? (
+                      <Loading />
+                    ) : (
+                      "Ingresar"
+                    )}
                   </span>
                 </button>
               </div>
@@ -125,3 +135,4 @@ export default function LoginForm() {
     </div>
   );
 }
+

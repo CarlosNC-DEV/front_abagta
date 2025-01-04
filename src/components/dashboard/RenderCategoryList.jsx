@@ -7,13 +7,12 @@ const RenderCategoryList = ({
   handleNavigateToUsers,
   handleEditCategory,
 }) => {
+  
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mb-4"></div>
-        <p className="text-lg text-gray-600 font-medium">
-          Cargando categorías...
-        </p>
+      <div className="flex justify-center items-center h-32">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+        <span className="ml-2 text-gray-600">Categorías...</span>
       </div>
     );
   }

@@ -1,52 +1,21 @@
-import { useState, useCallback, useMemo } from 'react'
-import { Phone, Edit, MessageSquare, UserPlus, SlidersHorizontal, ChevronLeft } from 'lucide-react'
-import ModalUsers from '../components/users/ModalUsers'
-import MobileMenu from '../components/MobileMenu'
-import { useNavigate } from 'react-router-dom'
-
-const initialUsers = [
-    {
-        id: 1,
-        name: 'CARLOS NOGUERA',
-        city: 'POPAYAN',
-        phone: '3001234567',
-        date: '2023-01-01',
-        state: 'active'
-    },
-    {
-        id: 2,
-        name: 'MARIA NOGUERA',
-        city: 'BOGOTA',
-        phone: '3009876543',
-        date: '2023-02-15',
-        state: 'expired'
-    },
-    {
-        id: 3,
-        name: 'JUAN NOGUERA',
-        city: 'MEDELLIN',
-        phone: '3005554444',
-        date: '2023-03-30',
-        state: 'inDebt'
-    },
-    {
-        id: 4,
-        name: 'ANA NOGUERA',
-        city: 'CALI',
-        phone: '3007778888',
-        date: '2023-04-10',
-        state: 'expired'
-    }
-]
+import { useState, useCallback, useMemo, useEffect } from 'react'
+import { Phone, Edit, MessageSquare, UserPlus, SlidersHorizontal, ChevronLeft, Calendar } from 'lucide-react'
+import ModalUsers from '../../components/users/ModalUsers'
+import MobileMenu from '../../components/MobileMenu'
+import ModalPayment from '../../components/users/ModalPayment'
+import { useNavigate, useParams } from 'react-router-dom'
+import { getAllUsersByCategory } from './domain/services'
 
 const UserScreen = () => {
     const navigate = useNavigate();
-
-    const [users, setUsers] = useState(initialUsers)
+    const { categoryId } = useParams();
+    const [users, setUsers] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingUser, setEditingUser] = useState(null)
-    const [activeTab, setActiveTab] = useState('active')
+    const [activeTab, setActiveTab] = useState('A')
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const [confirmationModal, setConfirmationModal] = useState({ isOpen: false, userId: null, payment: null })
 
     const handleWhatsApp = useCallback((phone) => {
         window.open(`https://wa.me/${phone}`, '_blank')
@@ -66,29 +35,48 @@ const UserScreen = () => {
         setIsModalOpen(true)
     }, [])
 
-    const handleSaveUser = useCallback((userData) => {
-        setUsers(prevUsers => {
-            if (userData.id) {
-                return prevUsers.map(user => user.id === userData.id ? { ...user, ...userData, city: userData.address } : user)
-            } else {
-                const newUser = {
-                    id: prevUsers.length + 1,
-                    ...userData,
-                    city: userData.address
-                }
-                return [...prevUsers, newUser]
-            }
-        })
+    const handleSaveUser = useCallback(() => {
+        getAllUsers()
         setIsModalOpen(false)
     }, [])
 
-    const filteredUsers = useMemo(() => users.filter(user => user.state === activeTab), [users, activeTab])
+    const handlePaymentConfirmation = useCallback((userId, payment) => {
+        setConfirmationModal({ isOpen: true, userId, payment })
+    }, [])
+
+    const handleConfirmPayment = useCallback(() => {
+        getAllUsers()
+    }, [])
+
+    useEffect(() => {
+        if (categoryId) {
+            getAllUsers();
+        }
+    }, [categoryId])
+
+    const getAllUsers = async () => {
+        setIsLoading(true)
+        try {
+            const response = await getAllUsersByCategory(categoryId)
+            if (response.status) {
+                setUsers(response.data)
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const filteredUsers = useMemo(() =>
+        users.filter(user => user.status === activeTab)
+        , [users, activeTab])
 
     const tabTitles = {
-        active: 'Activos',
-        expired: 'Vencidos',
-        inDebt: 'En Mora',
-        disabled: 'Inhabilitados'
+        A: 'Activos',
+        V: 'Vencidos',
+        M: 'En Mora',
+        I: 'Inhabilitados'
     }
 
     const UserCard = useCallback(({ user }) => (
@@ -96,35 +84,49 @@ const UserScreen = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div className="mb-4 space-y-1 sm:mb-0">
                     <p className="font-semibold text-gray-800">{user.name}</p>
-                    <p className="text-sm text-gray-600">{user.city}</p>
                     <p className="text-sm text-gray-600">{user.phone}</p>
+                    <p className="text-sm text-gray-600">{user.address}</p>
+                    {user.activePayment && (
+                        <button
+                            onClick={() => handlePaymentConfirmation(user.id, user.activePayment)}
+                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            <Calendar className="mr-2 h-4 w-4" />
+                            Pago pendiente: {user.activePayment.infoDate}
+                        </button>
+                    )}
                 </div>
-                <div className="flex justify-end gap-3">
-                    <button
-                        onClick={() => handleWhatsApp(user.phone)}
-                        className="rounded-full bg-green-500 p-2 text-white transition-colors hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
-                        aria-label="WhatsApp"
-                    >
-                        <MessageSquare className="h-5 w-5" />
-                    </button>
-                    <button
-                        onClick={() => handleCall(user.phone)}
-                        className="rounded-full bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
-                        aria-label="Llamar"
-                    >
-                        <Phone className="h-5 w-5" />
-                    </button>
-                    <button
-                        onClick={() => handleEdit(user)}
-                        className="rounded-full bg-yellow-500 p-2 text-white transition-colors hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
-                        aria-label="Editar"
-                    >
-                        <Edit className="h-5 w-5" />
-                    </button>
+                <div className="flex flex-col items-end gap-3">
+                    <div className="inline-block bg-yellow-400 rounded-lg px-3 py-1 border-2 border-black shadow-md">
+                        <p className="text-black font-bold tracking-wider">{user.plate}</p>
+                    </div>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => handleWhatsApp(user.phone)}
+                            className="rounded-full bg-green-500 p-2 text-white transition-colors hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
+                            aria-label="WhatsApp"
+                        >
+                            <MessageSquare className="h-5 w-5" />
+                        </button>
+                        <button
+                            onClick={() => handleCall(user.phone)}
+                            className="rounded-full bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+                            aria-label="Llamar"
+                        >
+                            <Phone className="h-5 w-5" />
+                        </button>
+                        <button
+                            onClick={() => handleEdit(user)}
+                            className="rounded-full bg-yellow-500 p-2 text-white transition-colors hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+                            aria-label="Editar"
+                        >
+                            <Edit className="h-5 w-5" />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    ), [handleWhatsApp, handleCall, handleEdit])
+    ), [handleWhatsApp, handleCall, handleEdit, handlePaymentConfirmation]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-secondary p-4 md:p-8">
@@ -184,11 +186,21 @@ const UserScreen = () => {
 
                     <div className="p-4 md:p-6">
                         <h2 className="mb-4 text-xl font-normal text-gray-800">{tabTitles[activeTab]}</h2>
-                        <div className="space-y-4">
-                            {filteredUsers.map((user) => (
-                                <UserCard key={user.id} user={user} />
-                            ))}
-                        </div>
+                        {isLoading ? (
+                            <div className="flex justify-center items-center h-32">
+                                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {filteredUsers.length > 0 ? (
+                                    filteredUsers.map((user) => (
+                                        <UserCard key={user.id} user={user} />
+                                    ))
+                                ) : (
+                                    <p className="text-center text-gray-500">Sin usuarios en esta categoría</p>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -201,6 +213,7 @@ const UserScreen = () => {
                 }}
                 onSave={handleSaveUser}
                 user={editingUser}
+                categoryId={categoryId}
             />
 
             <MobileMenu
@@ -209,6 +222,14 @@ const UserScreen = () => {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 tabTitles={tabTitles}
+            />
+
+            <ModalPayment
+                isOpen={confirmationModal.isOpen}
+                onClose={() => setConfirmationModal({ isOpen: false, userId: null, payment: null })}
+                onConfirm={handleConfirmPayment}
+                userId={confirmationModal.userId}
+                payment={confirmationModal.payment}
             />
         </div>
     )

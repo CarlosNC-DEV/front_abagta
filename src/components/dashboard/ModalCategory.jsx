@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X } from 'lucide-react';
 import { createCategories, updateCategory } from "./domain/services";
 import toast from "react-hot-toast";
+import Loading from "../loading/Loading";
 
 const ModalCategory = ({
   isOpen,
@@ -9,11 +10,12 @@ const ModalCategory = ({
   handleCategoryCreated,
   category = null,
 }) => {
+
   const initialState = { name: "", duration: "" };
   const [formData, setFormData] = useState(initialState);
+  const [isLoading, setIsLoading] = useState(false);
   const isEditing = Boolean(category);
 
-  // Cuando cambia la categoría seleccionada, actualizamos el formulario
   useEffect(() => {
     if (category) {
       setFormData({
@@ -43,6 +45,7 @@ const ModalCategory = ({
       duration: parseInt(formData.duration),
     };
 
+    setIsLoading(true);
     try {
       let response;
       if (isEditing) {
@@ -64,7 +67,7 @@ const ModalCategory = ({
       } else {
         toast.error(
           response.message ||
-            `Error al ${isEditing ? "actualizar" : "crear"} la categoría`
+          `Error al ${isEditing ? "actualizar" : "crear"} la categoría`
         );
       }
     } catch (error) {
@@ -75,6 +78,8 @@ const ModalCategory = ({
       toast.error(
         `Error al ${isEditing ? "actualizar" : "crear"} la categoría`
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -137,14 +142,20 @@ const ModalCategory = ({
               type="button"
               onClick={onClose}
               className="px-4 py-2 rounded-xl border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-base font-medium transition-colors"
+              disabled={isLoading}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-xl bg-primary text-white font-medium hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-base transition-colors"
+              className="px-4 py-2 rounded-xl bg-primary text-white font-medium hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-base transition-colors relative"
+              disabled={isLoading}
             >
-              {isEditing ? "Actualizar" : "Crear"}
+              {isLoading ? (
+                <Loading />
+              ) : (
+                isEditing ? "Actualizar" : "Crear"
+              )}
             </button>
           </div>
         </form>

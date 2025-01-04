@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { ENV } from '../config/pass'
 
 // Creamos un objeto para almacenar la función navigate
 const navigationHelper = {
@@ -7,6 +8,8 @@ const navigationHelper = {
         navigationHelper.navigate = navigate
     }
 }
+
+axios.defaults.baseURL = ENV.API_URL
 
 axios.interceptors.request.use(config => {
     const token = localStorage.getItem('token')

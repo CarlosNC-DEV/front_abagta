@@ -1,35 +1,87 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
+import { createUser, updateUser } from './domain/service'
+import { formatDateToDDMMYYYY, formatDateToISO } from './domain/utils'
+import Loading from '../loading/Loading'
+import toast from "react-hot-toast";
 
-const ModalUsers = ({ isOpen, onClose, onSave, user = null }) => {
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [date, setDate] = useState('')
-  const [address, setAddress] = useState('')
-  const [state, setState] = useState('active')
+const ModalUsers = ({ isOpen, onClose, onSave, user = null, categoryId }) => {
+
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    plate: '',
+    date: '',
+    address: '',
+    status: 'A'
+  })
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     if (user) {
-      setName(user.name || '')
-      setPhone(user.phone || '')
-      setDate(user.date || '')
-      setAddress(user.city || '')
-      setState(user.state || 'active')
+      setFormData({
+        name: user.name || '',
+        phone: user.phone || '',
+        plate: user.plate || '',
+        date: formatDateToISO(user.date) || '',
+        address: user.address || '',
+        status: user.status || 'A'
+      })
     } else {
-      setName('')
-      setPhone('')
-      setDate('')
-      setAddress('')
-      setState('active')
+      setFormData({
+        name: '',
+        phone: '',
+        plate: '',
+        date: '',
+        address: '',
+        status: 'A'
+      })
     }
   }, [user])
 
   if (!isOpen) return null
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    onSave({ id: user ? user.id : null, name, phone, date, address, state })
-    onClose()
+    setIsLoading(true)
+
+    try {
+      const formattedData = {
+        ...formData,
+        date: formatDateToDDMMYYYY(formData.date)
+      }
+
+      let response;
+      if (user) {
+        response = await updateUser(user.id, formattedData)
+      } else {
+        response = await createUser({
+          ...formattedData,
+          categoryId
+        })
+      }
+
+      if (response.status) {
+        toast.success(user ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente')
+        onSave()
+        onClose()
+      } else {
+        toast.error(response.message)
+      }
+
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
   return (
@@ -54,8 +106,9 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null }) => {
             <input
               type="text"
               id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               required
             />
@@ -67,8 +120,25 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null }) => {
             <input
               type="tel"
               id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              name="phone"
+              minLength={10}
+              maxLength={10}
+              value={formData.phone}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="plate" className="block text-sm font-medium text-gray-700">
+              Placa
+            </label>
+            <input
+              type="text"
+              id="plate"
+              name="plate"
+              value={formData.plate}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               required
             />
@@ -80,8 +150,9 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null }) => {
             <input
               type="date"
               id="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               required
             />
@@ -92,27 +163,29 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null }) => {
             </label>
             <textarea
               id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
               rows={3}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               required
             ></textarea>
           </div>
           <div>
-            <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700">
               Estado
             </label>
             <select
-              id="state"
-              value={state}
-              onChange={(e) => setState(e.target.value)}
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
-              <option value="active">Activo</option>
-              <option value="expired">Vencido</option>
-              <option value="inDebt">En mora</option>
-              <option value="disabled">Inhabilitado</option>
+              <option value="A">Activo</option>
+              <option value="V">Vencido</option>
+              <option value="M">En mora</option>
+              <option value="I">Inhabilitado</option>
             </select>
           </div>
           <div className="flex justify-end space-x-3">
@@ -120,14 +193,20 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null }) => {
               type="button"
               onClick={onClose}
               className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              disabled={isLoading}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 relative"
+              disabled={isLoading}
             >
-              {user ? 'Actualizar' : 'Guardar'}
+              {isLoading ? (
+                <Loading />
+              ) : (
+                user ? 'Actualizar' : 'Guardar'
+              )}
             </button>
           </div>
         </form>
@@ -137,4 +216,3 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null }) => {
 }
 
 export default ModalUsers
-

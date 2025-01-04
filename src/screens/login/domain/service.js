@@ -1,10 +1,9 @@
 import axios from "axios";
-import { ENV } from "../../../config/pass";
 
 export const login = async (credentials) => {
   try {
     const response = await axios.post(
-      `${ENV.API_URL}/users/login`,
+      "/users/login",
       credentials
     );
     return response.data;

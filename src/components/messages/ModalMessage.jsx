@@ -1,32 +1,60 @@
-import { useState, useEffect } from 'react'
-import { X } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { updateMessage } from "./domain/service";
+import toast from "react-hot-toast";
+import Loading from "../loading/Loading";
 
 const ModalMessage = ({ isOpen, onClose, message, onSave }) => {
-    const [content, setContent] = useState('')
+    const [content, setContent] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (message) {
-            setContent(message.content || '')
+            setContent(message.description || "");
         }
-    }, [message])
+    }, [message]);
 
-    if (!isOpen) return null
+    if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        onSave({ ...message, content })
-        onClose()
-    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            const response = await updateMessage(message.id, {
+                description: content,
+            });
+            if (response.status) {
+                toast.success("Mensaje actualizado correctamente");
+                onSave();
+                onClose();
+            } else {
+                toast.error(response.message);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const variables = [
-        { key: '{nombre}', label: 'nombre', class: 'bg-blue-500 text-white' },
-        { key: '{placa}', label: 'placa', class: 'bg-green-500 text-white' },
-        { key: '{telefono}', label: 'teléfono', class: 'bg-purple-500 text-white' }
-    ]
+        { key: "{nombre}", label: "nombre", class: "bg-blue-500 text-white" },
+        { key: "{placa}", label: "placa", class: "bg-green-500 text-white" },
+        { key: "{telefono}", label: "teléfono", class: "bg-purple-500 text-white" },
+    ];
 
     const insertVariable = (variable) => {
-        setContent(prev => prev + ' ' + variable)
-    }
+        const textArea = document.getElementById("message-content");
+        const start = textArea.selectionStart;
+        const end = textArea.selectionEnd;
+        const newContent =
+            content.substring(0, start) + variable + content.substring(end);
+        setContent(newContent);
+
+        setTimeout(() => {
+            textArea.focus();
+            const newCursorPos = start + variable.length;
+            textArea.setSelectionRange(newCursorPos, newCursorPos);
+        }, 0);
+    };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -60,7 +88,10 @@ const ModalMessage = ({ isOpen, onClose, message, onSave }) => {
                     </div>
 
                     <div>
-                        <label htmlFor="message-content" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                            htmlFor="message-content"
+                            className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                             Contenido del mensaje
                         </label>
                         <div className="relative">
@@ -83,21 +114,26 @@ const ModalMessage = ({ isOpen, onClose, message, onSave }) => {
                             type="button"
                             onClick={onClose}
                             className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                            disabled={isLoading}
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 rounded-md bg-primary text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                            className="px-4 py-2 rounded-md bg-primary text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary relative"
+                            disabled={isLoading}
                         >
-                            Guardar
+                            {isLoading ? (
+                                <Loading />
+                            ) : (
+                                "Guardar"
+                            )}
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default ModalMessage
-
+export default ModalMessage;
