@@ -1,3 +1,3 @@
 export const ENV = {
-    API_URL: 'https://www.carlosnogueradev.com/api'
+    API_URL: 'http://localhost:3000/api'
 }

@@ -12,6 +12,8 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null, categoryId }) => {
     phone: '',
     plate: '',
     date: '',
+    pay: '',
+    respay: '',
     address: '',
     status: 'A'
   })
@@ -24,6 +26,8 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null, categoryId }) => {
         phone: user.phone || '',
         plate: user.plate || '',
         date: formatDateToISO(user.date) || '',
+        pay: user.pay || '',
+        respay: user.respay || '',
         address: user.address || '',
         status: user.status || 'A'
       })
@@ -33,6 +37,8 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null, categoryId }) => {
         phone: '',
         plate: '',
         date: '',
+        pay: '',
+        respay: '',
         address: '',
         status: 'A'
       })
@@ -152,6 +158,34 @@ const ModalUsers = ({ isOpen, onClose, onSave, user = null, categoryId }) => {
               id="date"
               name="date"
               value={formData.date}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              Valor a pagar
+            </label>
+            <input
+              type="text"
+              id="pay"
+              name="pay"
+              value={formData.pay}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              Valor reconexión
+            </label>
+            <input
+              type="text"
+              id="respay"
+              name="respay"
+              value={formData.respay}
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               required
