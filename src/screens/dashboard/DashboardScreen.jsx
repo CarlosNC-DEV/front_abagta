@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronRight, Menu, CirclePlus, MessageCircle } from "lucide-react";
 import ModalCategory from "../../components/dashboard/ModalCategory";
 import BottomSheet from "../../components/dashboard/BottomSheet";
-import { allCategories } from "./domain/service";
+import { allCategories, deleteCategoriesById } from "./domain/service";
 import RenderCategoryList from "../../components/dashboard/RenderCategoryList";
 
 const DashboardScreen = () => {
@@ -28,6 +28,23 @@ const DashboardScreen = () => {
     e.stopPropagation();
     setSelectedCategory(category);
     setIsModalOpen(true);
+  };
+
+  const handleDeleteCategory = async (category, e) => {
+    try {
+      e.stopPropagation();
+      setIsLoading(true);
+      setError(null);
+      const result = await deleteCategoriesById(category.id);
+      if (result.status) {
+        handleCategoryCreated();
+      }
+    } catch (error) {
+      setError("Error al eliminar la categoría");
+      console.error("Error al eliminar la categoría:", error);
+    }finally{
+      setIsLoading(false);
+    }
   };
 
   const handleNavigateToMessages = () => {
@@ -124,6 +141,7 @@ const DashboardScreen = () => {
             categories={categories}
             handleNavigateToUsers={handleNavigateToUsers}
             handleEditCategory={handleEditCategory}
+            handleDeleteCategory={handleDeleteCategory}
           />
         </div>
       </div>

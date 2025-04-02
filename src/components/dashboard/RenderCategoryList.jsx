@@ -1,4 +1,6 @@
-import { Users, ChevronRight, Edit } from "lucide-react";
+import { useState } from "react";
+import { Users, ChevronRight, Edit, Trash } from "lucide-react";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 
 const RenderCategoryList = ({
   isLoading,
@@ -6,8 +8,29 @@ const RenderCategoryList = ({
   categories,
   handleNavigateToUsers,
   handleEditCategory,
+  handleDeleteCategory
 }) => {
-  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
+
+  const openDeleteModal = (category, e) => {
+    e.stopPropagation();
+    setCategoryToDelete(category);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setCategoryToDelete(null);
+  };
+
+  const confirmDelete = async () => {
+    if (categoryToDelete) {
+      await handleDeleteCategory(categoryToDelete, { stopPropagation: () => {} });
+      closeDeleteModal();
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-32">
@@ -66,34 +89,49 @@ const RenderCategoryList = ({
   }
 
   return (
-    <div className="space-y-3">
-      {categories.map((category) => (
-        <div key={category.id} className="flex gap-2">
-          <button
-            onClick={() => handleNavigateToUsers(category.id)}
-            className="flex-1 flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-800 transition-all hover:bg-gray-100 active:bg-gray-200 hover:shadow-md"
-          >
-            <div className="flex flex-col items-start">
-              <span className="font-semibold">{category.name}</span>
-              <span className="text-sm text-gray-600">
-                {category.duration} meses
-              </span>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <Users className="mr-2 h-4 w-4" />
-              <span className="font-semibold">{category.users}</span>
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </div>
-          </button>
-          <button
-            onClick={(e) => handleEditCategory(category, e)}
-            className="flex items-center justify-center px-3 rounded-xl border border-gray-200 bg-gray-50 text-primary hover:bg-gray-100 active:bg-gray-200 hover:shadow-md transition-all"
-          >
-            <Edit className="h-4 w-4" />
-          </button>
-        </div>
-      ))}
-    </div>
+    <>
+      <div className="space-y-3">
+        {categories.map((category) => (
+          <div key={category.id} className="flex gap-2">
+            <button
+              onClick={() => handleNavigateToUsers(category.id)}
+              className="flex-1 flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-800 transition-all hover:bg-gray-100 active:bg-gray-200 hover:shadow-md"
+            >
+              <div className="flex flex-col items-start">
+                <span className="font-semibold">{category.name}</span>
+                <span className="text-sm text-gray-600">
+                  {category.duration} meses
+                </span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Users className="mr-2 h-4 w-4" />
+                <span className="font-semibold">{category.users}</span>
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </div>
+            </button>
+            <button
+              onClick={(e) => openDeleteModal(category, e)}
+              className="flex items-center justify-center px-2 rounded-xl border border-gray-200 bg-gray-50 text-primary hover:bg-gray-100 active:bg-gray-200 hover:shadow-md transition-all"
+            >
+              <Trash className="h-4 w-4" />
+            </button>
+            <button
+              onClick={(e) => handleEditCategory(category, e)}
+              className="flex items-center justify-center px-2 rounded-xl border border-gray-200 bg-gray-50 text-primary hover:bg-gray-100 active:bg-gray-200 hover:shadow-md transition-all"
+            >
+              <Edit className="h-4 w-4" />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        categoryName={categoryToDelete?.name || ""}
+      />
+    </>
   );
 };
 
